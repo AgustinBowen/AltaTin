@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRUDitin</title>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+</head>
+<style>
+    body{
+        background: url(./images.png);
+        color: #ffff;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        justify-content: center;
+        align-items: center;
+    }
+    h1{
+        color: #00ff37;
+    }
+    p{
+        color: #ff00bf;
+    }
+    input{
+        background-color: #464646;
+        color: #fff;
+        height: 20px;
+        padding: 10px;
+        width: auto;
+    }
+    button{
+        background-color: #3a0069;
+        color: #fff;
+        height: 45px;
+        padding: 10px;
+        width: auto;
+    }
+    button:hover{
+        cursor: pointer;
+    }
+    input::placeholder{
+        color: #afafaf;
+    }
+    table{
+        background-color: #000613;
+        border: 6px double #464646;
+        padding: 15px;
+    }
+    table > tbody > tr > td{
+        padding: 10px;
+        border: 1px solid #fff;
+    }
+    .contenedor-tabla{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .acciones{
+        display: flex;
+        gap: 15px;
+    }
+    header{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    .wrapperMain{
+        display: flex;
+        justify-content: center;
+        gap: 100px;
+        margin-bottom: 50px;
+    }
+    #formAgregarCliente{
+        background-color: #000613;
+        padding: 20px;
+        border: 6px ridge #464646;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        width: 300px;
+    }
+    .contenedorFormulario{
+        display: none;
+    }
+    .active{
+        display: block;
+    }
+</style>
+<body>
+    <header>
+        <h1>CRUDitin</h1>
+        <p>El mejor CRUD del universo</p>
+        <nav class="acciones">
+            <input type="text" placeholder="Nombre,Apellido,Dni">
+            <button type="button" id="btnAbrirFormulario">Agregar Cliente</button>
+        </nav>
+    </header>
+    <main class="wrapperMain">
+        <section class="contenedor-tabla">
+            <h2>Clientes</h2>
+            <table>
+                <thead>
+                    <td>DNI</td>
+                    <td>Nombre</td>
+                    <td>Apellido</td>
+                    <td>Email</td>
+                    <td>Telefono</td>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </section>
+        <section class="contenedorFormulario">
+            <form action="POST" action="/clientes" id="formAgregarCliente">
+                <div class="formHeader" style="display: flex; justify-content: space-between; align-items: center;">
+                    <h1>Agregar Cliente</h1>
+                    <button type="button" style="width: 40px;" id="btnCerrarForm">X</button>
+                </div>
+                <input type="number" name="DNI" id="DNI" placeholder="DNI">
+                <input type="text" name="nombre" id="nombre" placeholder="Nombre">
+                <input type="text" name="apellido" id="apellido" placeholder="Apellido">
+                <input type="email" name="email" id="email" placeholder="verstappen@gmail.com">
+                <input type="number" name="telefono" id="telefono" placeholder="2804929292">
+                <button type="submit" id="btnAgregar">Agregar</button>
+            </form>
+        </section>
+    </main>
+<script type="module">
+    const url = "/clientes"
+    const btnAbrirFormulario = document.getElementById("btnAbrirFormulario")
+    const contenedorFormulario = document.querySelector(".contenedorFormulario")
+    const btnCerarrFormulario = document.getElementById("btnCerrarForm")
+    const btnAgregar = document.getElementById("btnAgregar")
+    const form = document.getElementById("formAgregarCliente")
+    btnAbrirFormulario.addEventListener('click',formularioHandler)
+    btnCerarrFormulario.addEventListener('click',formularioHandler)
+    try{
+        const data = await fetch(url);
+        if(!data.ok){
+            throw new Error(`Response status: ${data.status}`);
+        }
+        const json = await data.json();
+        document.querySelector("tbody").innerHTML = json.clientes.map(item =>
+            {
+                return `<tr>
+                            <td>${item.DNI}</td>
+                            <td>${item.nombre}</td>
+                            <td>${item.apellido}</td>
+                            <td>${item.email}</td>
+                            <td>${item.telefono}</td>
+                        </tr>
+                        `
+            }
+        ) 
+    } catch(error){
+        console.log(error)
+    }
+    function formularioHandler(){
+        if(!contenedorFormulario.classList.contains("active")){
+            contenedorFormulario.classList.add("active")
+        }else{
+            contenedorFormulario.classList.remove("active")
+        }
+    }
+</script>
+</body>
+</html>
