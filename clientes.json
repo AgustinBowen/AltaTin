@@ -12,5 +12,26 @@
     "apellido": "Verstappen",
     "email": "verstappen@gmail.com",
     "telefono": "2804-333333"
+  },
+  {
+    "DNI": "22333444",
+    "nombre": "Matias",
+    "apellido": "Rossi",
+    "email": "rossi@gmail.com",
+    "telefono": "2804171717"
+  },
+  {
+    "DNI": "43888999",
+    "nombre": "Hayley",
+    "apellido": "Williams",
+    "email": "paramore@gmail.com",
+    "telefono": "2804707070"
+  },
+  {
+    "DNI": "99666777",
+    "nombre": "Amy",
+    "apellido": "Lee",
+    "email": "fallen@gmail.com",
+    "telefono": "2804777777"
   }
 ]
