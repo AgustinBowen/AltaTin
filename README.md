@@ -1,2 +1,2 @@
-[![Capturadsadas.png](https://i.postimg.cc/0yvKkCzD/Capturadsadas.png)](https://postimg.cc/SJZxVC7x)
-[![das.png](https://i.postimg.cc/65XpnpBN/das.png)](https://postimg.cc/Z0wmhZ9f)
+[![Capturadsadas.png](https://i.postimg.cc/CKYG2gCy/Capturadsadas.png)](https://postimg.cc/jDgnWBkv)
+[![das.png](https://i.postimg.cc/fWFxNX7f/das.png)](https://postimg.cc/Sj6XLnvn)
