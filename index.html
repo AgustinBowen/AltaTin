@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CRUDitin</title>
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </head>
 <style>
     body{
@@ -36,6 +35,13 @@
         height: 45px;
         padding: 10px;
         width: auto;
+    }
+    .error {
+        color: red;
+        font-size: 12px;
+        margin-top: -10px;
+        margin-bottom: 10px;
+        display: block;
     }
     button:hover{
         cursor: pointer;
@@ -94,7 +100,7 @@
         <h1>CRUDitin</h1>
         <p>El mejor CRUD del universo</p>
         <nav class="acciones">
-            <input type="text" placeholder="Nombre,Apellido,Dni">
+            <input type="text" placeholder="Nombre,Apellido,Dni" id="buscador">
             <button type="button" id="btnAbrirFormulario">Agregar Cliente</button>
         </nav>
     </header>
@@ -114,16 +120,25 @@
             </table>
         </section>
         <section class="contenedorFormulario">
-            <form action="POST" action="/clientes" id="formAgregarCliente">
+            <form method="POST" action="/clientes" id="formAgregarCliente">
                 <div class="formHeader" style="display: flex; justify-content: space-between; align-items: center;">
                     <h1>Agregar Cliente</h1>
                     <button type="button" style="width: 40px;" id="btnCerrarForm">X</button>
                 </div>
                 <input type="number" name="DNI" id="DNI" placeholder="DNI">
+                <span class="error" id="errorDNI"></span>
+
                 <input type="text" name="nombre" id="nombre" placeholder="Nombre">
+                <span class="error" id="errorNombre"></span>
+
                 <input type="text" name="apellido" id="apellido" placeholder="Apellido">
+                <span class="error" id="errorApellido"></span>
+
                 <input type="email" name="email" id="email" placeholder="verstappen@gmail.com">
-                <input type="number" name="telefono" id="telefono" placeholder="2804929292">
+                <span class="error" id="errorEmail"></span>
+
+                <input type="text" name="telefono" id="telefono" placeholder="2804929292">
+                <span class="error" id="errorTelefono"></span>
                 <button type="submit" id="btnAgregar">Agregar</button>
             </form>
         </section>
@@ -135,28 +150,44 @@
     const btnCerarrFormulario = document.getElementById("btnCerrarForm")
     const btnAgregar = document.getElementById("btnAgregar")
     const form = document.getElementById("formAgregarCliente")
+    let clientes = [];
     btnAbrirFormulario.addEventListener('click',formularioHandler)
     btnCerarrFormulario.addEventListener('click',formularioHandler)
-    try{
+    const buscador = document.getElementById("buscador");
+
+    buscador.addEventListener("input", () => {
+        const texto = buscador.value.toLowerCase();
+
+        const filtrados = clientes.filter(c => 
+            c.DNI.toString().includes(texto) ||
+            c.nombre.toLowerCase().includes(texto) ||
+            c.apellido.toLowerCase().includes(texto)
+        );
+
+        renderTabla(filtrados);
+    });
+
+    function renderTabla(lista) {
+        document.querySelector("tbody").innerHTML = lista.map(item => `
+            <tr>
+                <td>${item.DNI}</td>
+                <td>${item.nombre}</td>
+                <td>${item.apellido}</td>
+                <td>${item.email}</td>
+                <td>${item.telefono}</td>
+            </tr>
+        `).join("");
+    }
+
+    try {
         const data = await fetch(url);
-        if(!data.ok){
+        if (!data.ok) {
             throw new Error(`Response status: ${data.status}`);
         }
-        const json = await data.json();
-        document.querySelector("tbody").innerHTML = json.clientes.map(item =>
-            {
-                return `<tr>
-                            <td>${item.DNI}</td>
-                            <td>${item.nombre}</td>
-                            <td>${item.apellido}</td>
-                            <td>${item.email}</td>
-                            <td>${item.telefono}</td>
-                        </tr>
-                        `
-            }
-        ) 
-    } catch(error){
-        console.log(error)
+        clientes = await data.json();
+        renderTabla(clientes);
+    } catch (error) {
+        console.log(error);
     }
     function formularioHandler(){
         if(!contenedorFormulario.classList.contains("active")){
@@ -165,6 +196,68 @@
             contenedorFormulario.classList.remove("active")
         }
     }
+
+    form.addEventListener('submit', event => {
+        event.preventDefault();
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData);
+
+        // Expresiones regulares
+        const regexNombre = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/;
+        const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const regexTelefono = /^[0-9-]+$/;
+
+        // Reset de errores
+        document.querySelectorAll(".error").forEach(el => el.textContent = "");
+
+        let valido = true;
+
+        if (!regexNombre.test(data.nombre)) {
+            document.getElementById("errorNombre").textContent = "El nombre solo puede contener letras.";
+            valido = false;
+        }
+        if (!regexNombre.test(data.apellido)) {
+            document.getElementById("errorApellido").textContent = "El apellido solo puede contener letras.";
+            valido = false;
+        }
+        if (!regexEmail.test(data.email)) {
+            document.getElementById("errorEmail").textContent = "El email no es válido.";
+            valido = false;
+        }
+        if (!regexTelefono.test(data.telefono)) {
+            document.getElementById("errorTelefono").textContent = "El teléfono solo puede contener números y '-'.";
+            valido = false;
+        }
+
+        if (!valido) return; // si hay errores, no mando nada
+
+        // Si todo está bien, mando al backend
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        }).then(res => {
+            if (!res.ok) {
+                return res.json().then(err => { throw err; });
+            }
+            return res.json();
+        }).then(respuesta => {
+            clientes.push(data);
+            renderTabla(clientes);
+            form.reset();
+            contenedorFormulario.classList.remove("active");
+        }).catch(error => {
+            // si el backend devuelve errores, los muestro en los inputs
+            if (error.errores) {
+                if (error.errores.nombre) document.getElementById("errorNombre").textContent = error.errores.nombre;
+                if (error.errores.apellido) document.getElementById("errorApellido").textContent = error.errores.apellido;
+                if (error.errores.email) document.getElementById("errorEmail").textContent = error.errores.email;
+                if (error.errores.telefono) document.getElementById("errorTelefono").textContent = error.errores.telefono;
+            }
+        });
+    });
 </script>
 </body>
 </html>
