@@ -28,3 +28,5 @@ Instalá las dependencias necesarias:
 npm install
 node app.js
 ```
+## HORAS DE TRABAJO APROX
+5 horas
